@@ -3,8 +3,7 @@ from discord.ext import commands
 from firebase_admin import credentials
 
 if not os.path.exists("data/firebase.json"):
-    print("firebase.json not found, please run setup.py")
-    exit()
+    exit("firebase.json not found, please run setup.py")
 
 cred = credentials.Certificate("data/firebase.json")
 firebase_admin.initialize_app(cred)
