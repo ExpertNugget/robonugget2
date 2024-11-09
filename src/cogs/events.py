@@ -16,9 +16,9 @@ class events(commands.Cog):
         elif 1302848869725638718 in [role.id for role in creatorUser.roles]:
             forumChannel = self.bot.get_channel(1303071016544763954)
 
-        emebed = discord.Embed()
-        emebed.add_field(name="Event location", value=ShechedEvent.location)
-        emebed.add_field(
+        embed = discord.Embed()
+        embed.add_field(name="Event location", value=ShechedEvent.location)
+        embed.add_field(
             name="Event Link", value=f"https://discord.com/events/{ShechedEvent.id}"
         )
 
@@ -26,7 +26,7 @@ class events(commands.Cog):
             name=ShechedEvent.name,
             content=ShechedEvent.description
             + f"\nEvent location: {ShechedEvent.location}\n[Event Link](https://discord.com/events/{ShechedEvent.id})",
-            emebed=emebed,
+            embed=embed,
         )
 
         await thread.add_user(creatorUser)
