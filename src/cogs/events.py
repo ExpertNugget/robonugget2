@@ -16,11 +16,15 @@ class events(commands.Cog):
         elif 1302848869725638718 in [role.id for role in creatorUser.roles]:
             forumChannel = self.bot.get_channel(1303071016544763954) # Hardcode
 
-        embed = discord.Embed()
+        embed = discord.Embed(description='Additional Info')
         embed.add_field(name="Event location", value=ShechedEvent.location)
         embed.add_field(
-            name="Event Link", value=f"https://discord.gg/pQA9BJz6XP/{ShechedEvent.id}" # Hardcode
+            name="Event Invite Link", value=f"https://discord.gg/pQA9BJz6XP/{ShechedEvent.id}" # Hardcode
         )
+        embed.add_field(
+            name="Event Date", value=f"<t:{round(ShechedEvent.start_time.timestamp())}:R> - <t:{round(ShechedEvent.end_time.timestamp())}:R>"}"
+        )
+        embed.add_field(name="Event Members", value=f"Creator: {creatorUser.mention}")
 
         thread = await forumChannel.create_thread(
             name=ShechedEvent.name,
@@ -30,6 +34,11 @@ class events(commands.Cog):
 
         await thread.add_user(creatorUser)
 
+    @commands.Cog.listener()
+    async def on_thread_create(self, thread):
+        await thread.send("")
+
 
 def setup(bot):
+
     bot.add_cog(events(bot))
