@@ -37,7 +37,7 @@ async def reload(ctx, cog=discord.Option(str, choices=cog_list)):
 @bot.slash_command(name="shutdown", description="[Owner Only] - Shuts down the bot")
 @commands.is_owner()
 async def shutdown(ctx):
-    await ctx.defer()
+    await ctx.respond("Shutting down...")
     await bot.close()
 
 
@@ -60,14 +60,14 @@ for cog in cog_list:
     ###! -nugget
 try:
     ###> opens data.json and stores the token in a variable -nugget
-    with open("data.json") as f:
+    with open("data/token.json") as f:
         data = json.load(f)
         token = data["token"]
 ###! -nugget
 ### > if data.json doesn't exist, it asks for the token and creates data.json -nugget
 except:
-    token = input("Token: ")
-    with open("data.json", "w") as f:
+    token = input("please enter your Discord bot token: ")
+    with open("data/token.json", "w") as f:
         json.dump({"token": token}, f)
 ###! -nugget
 

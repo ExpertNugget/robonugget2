@@ -1,5 +1,13 @@
-import discord
+import discord, firebase_admin, os
 from discord.ext import commands
+from firebase_admin import credentials
+
+if not os.path.exists("data/firebase.json"):
+    print("firebase.json not found, please run setup.py")
+    exit()
+
+cred = credentials.Certificate("data/firebase.json")
+firebase_admin.initialize_app(cred)
 
 
 class events(commands.Cog):
@@ -30,8 +38,6 @@ class events(commands.Cog):
         )
 
         await thread.add_user(creatorUser)
-
-        await thread.send()
 
 
 def setup(bot):

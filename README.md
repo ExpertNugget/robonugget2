@@ -1,2 +1,4 @@
+> [!IMPORTANT]
+> This bot is coded to only work in a specific server, edits to cogs/events.py are needed to make it work in other servers.
 # RoboNugget2
-This bot is designed to work for one server, there are hard coded variables that need to be changed to work for another server.
+RoboNugget2 is the bot for the Streamer Community Discord Server.

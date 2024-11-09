@@ -4,5 +4,5 @@
 !/src/
 !.gitignore
 !README.md
-src/data.json
+src/data/*
 src/cogs/__pycache__/*
