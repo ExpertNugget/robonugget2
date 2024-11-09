@@ -29,7 +29,6 @@ async def on_ready():
 
 ###> grabs all files ending in .py in src/cogs, and stores them in a list minus the .py to load all cogs. -nugget
 cog_list = [f[:-3] for f in os.listdir("./cogs") if f.endswith(".py")]
-print(cog_list)
 ###! -nugget
 
 
