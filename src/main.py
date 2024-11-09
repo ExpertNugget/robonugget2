@@ -29,9 +29,9 @@ async def reload(ctx, cog=discord.Option(str, choices=cog_list)):
     await ctx.defer()
     try:
         bot.reload_extension(f"cogs.{cog}")
-        await ctx.reply(f"`{cog}.py` has been reloaded :)")
+        await ctx.respond(f"`{cog}.py` has been reloaded :)")
     except:
-        await ctx.reply(f"`{cog}.py` has failed to reload :(")
+        await ctx.respond(f"`{cog}.py` has failed to reload :(")
 
 
 @bot.slash_command(name="shutdown", description="[Owner Only] - Shuts down the bot")
