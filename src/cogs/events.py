@@ -1,13 +1,6 @@
-import discord, firebase_admin, os
+import discord
+
 from discord.ext import commands
-from firebase_admin import credentials
-
-if not os.path.exists("data/firebase.json"):
-    exit("firebase.json not found, please run setup.py")
-
-cred = credentials.Certificate("data/firebase.json")
-firebase_admin.initialize_app(cred)
-
 
 class events(commands.Cog):
     def __init__(self, bot):

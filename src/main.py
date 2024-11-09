@@ -1,5 +1,9 @@
-import discord, os, json
+import discord, os, json, firebase_admin
+
 from discord.ext import commands
+from firebase_admin import credentials
+
+
 
 ###> minor corrections for running dir, mainly for vsc -nugget
 if "/src" in os.getcwd():
@@ -8,11 +12,16 @@ else:
     os.chdir("./src")
 ###! -nugget
 
+if not os.path.exists("data/firebase.json"):
+    exit("firebase.json not found, please run setup.py")
+
+cred = credentials.Certificate("data/firebase.json")
+firebase_admin.initialize_app(cred)
+
 ###> having all intents just makes life easy, will change later -nugget
 bot = discord.Bot(intents=discord.Intents.all())
-
-
 ###! -nugget
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
@@ -27,11 +36,13 @@ cog_list = [f[:-3] for f in os.listdir("./cogs") if f.endswith(".py")]
 @commands.is_owner()
 async def reload(ctx, cog=discord.Option(str, choices=cog_list)):
     await ctx.defer()
-    try:
-        bot.reload_extension(f"cogs.{cog}")
-        await ctx.respond(f"`{cog}.py` has been reloaded :)")
-    except:
-        await ctx.respond(f"`{cog}.py` has failed to reload :(")
+    bot.reload_extension(f"cogs.{cog}")
+    #try:
+    #    bot.reload_extension(f"cogs.{cog}")
+    #    await ctx.respond(f"`{cog}.py` has been reloaded :)")
+    #except:
+    #    #if it fails, it returns error
+    #    await ctx.respond(f"`{cog}.py` has failed to reload :("\nError: {}")
 
 
 @bot.slash_command(name="shutdown", description="[Owner Only] - Shuts down the bot")
