@@ -26,13 +26,12 @@ class events(commands.Cog):
         embed = discord.Embed()
         embed.add_field(name="Event location", value=ShechedEvent.location)
         embed.add_field(
-            name="Event Link", value=f"https://discord.com/events/{ShechedEvent.id}"
+            name="Event Link", value=f"https://discord.gg/pQA9BJz6XP/{ShechedEvent.id}" # Hardcode
         )
 
         thread = await forumChannel.create_thread(
             name=ShechedEvent.name,
-            content=ShechedEvent.description
-            + f"\nEvent location: {ShechedEvent.location}\n[Event Link](https://discord.gg/pQA9BJz6XP/{ShechedEvent.id})", # Hardcode
+            content=ShechedEvent.description,
             embed=embed,
         )
 
