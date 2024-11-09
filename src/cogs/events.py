@@ -15,13 +15,13 @@ class events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_scheduled_event_create(self, ShechedEvent):
-        guild = self.bot.get_guild(1302844590063095888)
+        guild = self.bot.get_guild(1302844590063095888) # Hardcode
         creatorUser = await guild.fetch_member(ShechedEvent.creator_id)
 
         if 1302848813509115936 in [role.id for role in creatorUser.roles]:
-            forumChannel = self.bot.get_channel(1302847972748300440)
+            forumChannel = self.bot.get_channel(1302847972748300440) # Hardcode
         elif 1302848869725638718 in [role.id for role in creatorUser.roles]:
-            forumChannel = self.bot.get_channel(1303071016544763954)
+            forumChannel = self.bot.get_channel(1303071016544763954) # Hardcode
 
         embed = discord.Embed()
         embed.add_field(name="Event location", value=ShechedEvent.location)
@@ -32,7 +32,7 @@ class events(commands.Cog):
         thread = await forumChannel.create_thread(
             name=ShechedEvent.name,
             content=ShechedEvent.description
-            + f"\nEvent location: {ShechedEvent.location}\n[Event Link](https://discord.com/events/{ShechedEvent.id})",
+            + f"\nEvent location: {ShechedEvent.location}\n[Event Link](https://discord.gg/pQA9BJz6XP/{ShechedEvent.id})", # Hardcode
             embed=embed,
         )
 
