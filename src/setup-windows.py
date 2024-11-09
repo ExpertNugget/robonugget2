@@ -1,5 +1,5 @@
 # Script should only be ran on a fresh install -nugget
-import os
+import os, time, json
 
 
 ###> attempts to change running directory to root if not already there -nugget
@@ -18,6 +18,11 @@ if not os.path.exists("data/firebase.json"):
     exit(
         "firebase.json not found, get it from https://console.firebase.google.com, then run setup.py again"
     )
+# gets token
+token = input("Please enter your Discord bot token: ")
+with open("data/token.json") as f:
+    data = json.load(f)
+    token = data["token"]
 
 
 ###> check if virtual environment is active or not -nugget
@@ -48,4 +53,6 @@ os.system("pip install -r requirements.txt")
 
 
 # starts the bot
+print("Starting bot...\n Run main.py to start the bot again.")
+time.wait(5)
 os.system("python main.py")
