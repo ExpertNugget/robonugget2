@@ -58,11 +58,17 @@ for cog in cog_list:
     #    print(f"Failed to load {cog}")
     #    pass  # moves onto next cog -nugget
     ###! -nugget
-
-###> opens data.json and stores the token in a variable -nugget
-with open("data.json") as f:
-    data = json.load(f)
-    token = data["token"]
+try:
+    ###> opens data.json and stores the token in a variable -nugget
+    with open("data.json") as f:
+        data = json.load(f)
+        token = data["token"]
+###! -nugget
+### > if data.json doesn't exist, it asks for the token and creates data.json -nugget
+except:
+    token = input("Token: ")
+    with open("data.json", "w") as f:
+        json.dump({"token": token}, f)
 ###! -nugget
 
 bot.run(token)
