@@ -29,6 +29,7 @@ async def on_ready():
 
 ###> grabs all files ending in .py in src/cogs, and stores them in a list minus the .py to load all cogs. -nugget
 cog_list = [f[:-3] for f in os.listdir("./cogs") if f.endswith(".py")]
+print(cog_list)
 ###! -nugget
 
 
@@ -36,13 +37,12 @@ cog_list = [f[:-3] for f in os.listdir("./cogs") if f.endswith(".py")]
 @commands.is_owner()
 async def reload(ctx, cog=discord.Option(str, choices=cog_list)):
     await ctx.defer()
-    bot.reload_extension(f"cogs.{cog}")
-    #try:
-    #    bot.reload_extension(f"cogs.{cog}")
-    #    await ctx.respond(f"`{cog}.py` has been reloaded :)")
-    #except:
-    #    #if it fails, it returns error
-    #    await ctx.respond(f"`{cog}.py` has failed to reload :("\nError: {}")
+    try:
+        bot.reload_extension(f"cogs.{cog}")
+        await ctx.respond(f"`{cog}.py` has been reloaded :)")
+    except Exception as e:
+        #if it fails, it returns error
+        await ctx.respond(f"`{cog}.py` has failed to reload :(\n{e}")
 
 
 @bot.slash_command(name="shutdown", description="[Owner Only] - Shuts down the bot")
@@ -60,14 +60,14 @@ for cog in cog_list:
     ###> Skips cog if it's in the exclude list -nugget
     if cog in exclude_list:
         continue  # moves onto next cog
-    bot.load_extension(f"cogs.{cog}")
     ###! -nugget
     ####> Attempts to load cogs and doesn't load if it fails -nugget
-    # try:
-    #    bot.load_extension(f"cogs.{cog}")  # loads cogs -nugget
-    # except:
-    #    print(f"Failed to load {cog}")
-    #    pass  # moves onto next cog -nugget
+    try:
+       print(f"Loading {cog}")
+       bot.load_extension(f"cogs.{cog}")  # loads cogs -nugget
+    except Exception as e:
+       print(f"Failed to load {cog}\n{e}")
+       pass  # moves onto next cog -nugget
     ###! -nugget
 try:
     ###> opens data.json and stores the token in a variable -nugget
