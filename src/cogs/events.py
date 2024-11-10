@@ -22,7 +22,7 @@ class events(commands.Cog):
             name="Event Invite Link", value=f"https://discord.gg/pQA9BJz6XP/{ShechedEvent.id}" # Hardcode
         )
         embed.add_field(
-            name="Event Date", value=f"<t:{round(ShechedEvent.start_time.timestamp())}:R> - <t:{round(ShechedEvent.end_time.timestamp())}:R>"}"
+            name="Event Date", value=f"<t:{round(ShechedEvent.start_time.timestamp())}:R> - <t:{round(ShechedEvent.end_time.timestamp())}:R>"
         )
         embed.add_field(name="Event Members", value=f"Creator: {creatorUser.mention}")
 
@@ -33,12 +33,19 @@ class events(commands.Cog):
         )
 
         await thread.add_user(creatorUser)
+        # store event id and thread id in events.py
+        
+
+
+
 
     @commands.Cog.listener()
     async def on_thread_create(self, thread):
-        await thread.send("")
+        pass
 
+    @commands.Cog.listener()
+    async def on_thread_delete(self, thread):
+        pass
 
 def setup(bot):
-
     bot.add_cog(events(bot))
