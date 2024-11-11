@@ -7,33 +7,28 @@ class events(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_scheduled_event_create(self, ShechedEvent):
-        guild = self.bot.get_guild(1302844590063095888) # Hardcode
-        creatorUser = await guild.fetch_member(ShechedEvent.creator_id)
+    async def on_scheduled_event_create(self, event):
+        guild = self.bot.get_guild(1302844590063095888)
+        creator = await guild.fetch_member(event.creator_id)
 
-        if 1302848813509115936 in [role.id for role in creatorUser.roles]:
-            forumChannel = self.bot.get_channel(1302847972748300440) # Hardcode
-        elif 1302848869725638718 in [role.id for role in creatorUser.roles]:
-            forumChannel = self.bot.get_channel(1303071016544763954) # Hardcode
+        if 1302848813509115936 in [role.id for role in creator.roles]:
+            channel = self.bot.get_channel(1302847972748300440)
+        elif 1302848869725638718 in [role.id for role in creator.roles]:
+            channel = self.bot.get_channel(1303071016544763954)
 
         embed = discord.Embed(description='Additional Info')
-        embed.add_field(name="Event location", value=ShechedEvent.location)
-        embed.add_field(
-            name="Event Invite Link", value=f"https://discord.gg/pQA9BJz6XP/{ShechedEvent.id}" # Hardcode
-        )
-        embed.add_field(
-            name="Event Date", value=f"<t:{round(ShechedEvent.start_time.timestamp())}:R> - <t:{round(ShechedEvent.end_time.timestamp())}:R>"
-        )
-        embed.add_field(name="Event Members", value=f"Creator: {creatorUser.mention}")
+        embed.add_field(name='Location', value=event.location)
+        embed.add_field(name='Invite Link', value=f'https://discord.gg/pQA9BJz6XP/{event.id}')
+        embed.add_field(name='Date', value=f'<t:{int(event.start_time.timestamp())}:R> - <t:{int(event.end_time.timestamp())}:R>')
+        embed.add_field(name='Event Members', value=f'Creator: {creator.mention}')
 
-        thread = await forumChannel.create_thread(
-            name=ShechedEvent.name,
-            content=ShechedEvent.description,
+        thread = await channel.create_thread(
+            name=event.name,
+            content=event.description,
             embed=embed,
         )
 
-        await thread.add_user(creatorUser)
-        # store event id and thread id in events.py
+        await thread.add_user(creator)
         
 
 
