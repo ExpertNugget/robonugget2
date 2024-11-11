@@ -11,6 +11,7 @@ class events(commands.Cog):
         pass
     
     async def create_thread(self, event):
+        print("create_thread called")
         guild = self.bot.get_guild(1302844590063095888)
         creator = await guild.fetch_member(event.creator_id)
 
@@ -50,68 +51,97 @@ class events(commands.Cog):
     @commands.Cog.listener()
     async def on_scheduled_event_create(self, event):
         await self.create_thread(event)
+    
+    @commands.Cog.listener()
+    async def on_scheduled_event_delete(self, event):
+        with open('data/events.json', 'r') as f:
+            data = json.load(f)
+        event_id = str(event.id)
+        if event_id in data['eventsDict']:
+            thread_id = data['eventsDict'][event_id]
+            thread = self.bot.get_channel(thread_id)
+            await thread.delete()
+            del data['eventsDict'][event_id]
+            with open('data/events.json', 'w') as f:
+                json.dump(data, f)
 
     @commands.Cog.listener()
     async def on_ready(self):
+        print("Bot is ready, running on_ready event listener")
         guild = self.bot.get_guild(1302844590063095888)
-        events = guild.scheduled_events
-        event_ids = []
-        for event in events:
-            event_ids.append(event.id)
-        unique_event_ids = []
-        dupe_event_ids = []
-        for event_id in event_ids:
-            if event_id not in unique_event_ids:
-                unique_event_ids.append(event_id)
-            else:
-                dupe_event_ids.append(event_id)
+        print(f"Retrieved guild: {guild.name} (ID: {guild.id})")
+        events = await guild.fetch_scheduled_events()
+        print(f"Retrieved {len(events)} scheduled events")
+
+        channels = [guild.get_channel(1302847972748300440), guild.get_channel(1303071016544763954)]
+        threads = [thread for channel in channels for thread in channel.threads]
+    
         with open('data/events.json', 'r') as f:
             try:
                 data = json.load(f)
+                print("Loaded events.json file successfully")
             except:
                 data = {'eventsDict': {}}
-        
-        for event_id in dupe_event_ids:
-            print(f'event ID: {data['eventsDict'][str(event_id)]}') 
-            try:
-                thread_id = data['eventsDict'][str(event_id)]
-                guild = self.bot.get_guild(1302844590063095888)
-                thread = guild.get_channel(thread_id)
-                await thread.delete()
-                del data['eventsDict'][str(event_id)]
-            except:
-                del data['eventsDict'][str(event_id)]
-
-        for event_id in unique_event_ids:              
-            try:
-                thread_id = data['eventsDict'][str(event_id)]
-                guild = self.bot.get_guild(1302844590063095888)
-                thread = guild.get_thread(thread_id)
-            except:
-                event = await guild.fetch_scheduled_event(event_id)
-                thread = await self.create_thread(event)
-                data['eventsDict'][str(event_id)] = thread.id
-
-        guild = self.bot.get_guild(1302844590063095888)
-        channel = guild.get_channel(1302847972748300440)
-        channel2 = guild.get_channel(1303071016544763954)
-        for thread in channel.threads:
-            if thread.id not in data['eventsDict'].values():
-                await thread.delete()
-        for thread in channel2.threads:
-            if thread.id not in data['eventsDict'].values():
-                await thread.delete()
-
+                print("Failed to load events.json file, creating new dictionary")
+    
+        # Update events dictionary to reflect current state
+        data['eventsDict'] = {}
+        for event in events:
+            thread_id = next((thread.id for thread in threads if thread.name == event.name), None)
+            if thread_id:
+                data['eventsDict'][str(event.id)] = thread_id
+    
+        # Recreate deleted threads for scheduled events
+        for event in events:
+            thread_id = data['eventsDict'].get(str(event.id))
+            if thread_id and not guild.get_thread(thread_id):
+                print(f"Thread for event {event.id} no longer exists, deleting event")
+                try:
+                    await event.delete()
+                    del data['eventsDict'][str(event.id)]
+                    print(f"Deleted event {event.id} and removed from events.json")
+                except Exception as e:
+                    print(f"Failed to delete event {event.id}: {str(e)}")
+            elif not thread_id:
+                print(f"No thread found for event {event.id}, creating new thread")
+                try:
+                    thread = await self.create_thread(event)
+                    data['eventsDict'][str(event.id)] = thread.id
+                    print(f"Created new thread for event {event.id} and added to events.json")
+                except Exception as e:
+                    print(f"Failed to create thread for event {event.id}: {str(e)}")
+    
+        # Clean up threads in channels
+        channels = [guild.get_channel(1302847972748300440), guild.get_channel(1303071016544763954)]
+        for channel in channels:
+            print(f"Cleaning up threads in channel {channel.name} (ID: {channel.id})")
+            for thread in channel.threads:
+                if thread.id not in data['eventsDict'].values():
+                    print(f"Deleting thread {thread.id} (not associated with an event)")
+                    await thread.delete()
+                else:
+                    print(f"Skipping thread {thread.id} (associated with an event)")
+    
+        # Save updated events dictionary to file
         with open('data/events.json', 'w') as f:
             json.dump(data, f)
-
-    @commands.Cog.listener()
-    async def on_thread_create(self, thread):
-        pass
+        print("Saved updated events.json file")
 
     @commands.Cog.listener()
     async def on_thread_delete(self, thread):
-        pass
+        # delete thread from events.json and its event
+        with open('data/events.json', 'r') as f:
+            data = json.load(f)
+        event_id_to_delete = next((event_id for event_id, thread_id in data['eventsDict'].items() if thread_id == thread.id), None)
+        if event_id_to_delete:
+            del data['eventsDict'][event_id_to_delete]
+            with open('data/events.json', 'w') as f:
+                json.dump(data, f)
+            try:
+                event = await thread.guild.fetch_scheduled_event(int(event_id_to_delete))
+                await event.delete()
+            except Exception:
+                pass
 
 def setup(bot):
     bot.add_cog(events(bot))
