@@ -46,15 +46,10 @@ class events(commands.Cog):
         with open('data/events.json', 'w') as f:
             json.dump(data, f)
         return thread
-
        
     @commands.Cog.listener()
     async def on_scheduled_event_create(self, event):
         await self.create_thread(event)
-        
-
-
-        
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -109,30 +104,6 @@ class events(commands.Cog):
 
         with open('data/events.json', 'w') as f:
             json.dump(data, f)
-
-            
-                
-        
-        
-            
-        
-
-
-
-
-        
-
-        
-
-        
-            
-
-
-            
-
-
-
-
 
     @commands.Cog.listener()
     async def on_thread_create(self, thread):
