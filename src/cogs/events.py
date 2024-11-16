@@ -2,13 +2,41 @@ import discord, json
 
 from discord.ext import commands
 
+class editModal(discord.ui.Modal):
+    def __init__(self):
+        super().__init__()
+        self.add_item(discord.ui.InputText(label="Title"))
+        self.add_item(discord.ui.InputText(label="Description"), style=discord.InputTextStyle.long)
+        self.add_item(discord.ui.InputText(label="Location"))
+
+
 class events(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        pass
+    # /edit command thats only ran in a event thread, and uses a modal
+
+    @discord.slash_command(name="edit", description="Edit an event")
+    async def edit(self, ctx):
+        modal = editModal()
+        await ctx.send_modal(view=modal)
+        thread = ctx.channel
+        guild = self.bot.get_guild(1302844590063095888)
+        with open('data/events.json', 'r') as f:
+            data = json.load(f)
+        event_id = next((event_id for event_id, thread_id in data['eventsDict'].items() if thread_id == thread.id), None)
+        if not event_id:
+            await ctx.send("This command can only be ran in an event thread")
+            return
+        guild = self.bot.get_guild(1302844590063095888)
+        event = await guild.fetch_scheduled_event(int(event_id))
+        embed = discord.Embed(description='Additional Info')
+        embed.add_field(name='Location', value=event.location)
+        embed.add_field(name='Invite Link', value=f'https://discord.gg/pQA9BJz6XP/{event.id}')
+        embed.add_field(name='Date', value=f'<t:{int(event.start_time.timestamp())}:F> - <t:{int(event.end_time.timestamp())}:R>')
+        embed.add_field(name='Event Members', value=f'Creator: {event.creator_id}')
+        await thread.edit(name=modal.children[0].value, content=modal.children[1].value, embed=embed)
+        await event.edit(name=modal.children[0].value, description=modal.children[1].value, location=modal.children[2].value)
     
     async def create_thread(self, event):
         print("create_thread called")
@@ -23,7 +51,7 @@ class events(commands.Cog):
         embed = discord.Embed(description='Additional Info')
         embed.add_field(name='Location', value=event.location)
         embed.add_field(name='Invite Link', value=f'https://discord.gg/pQA9BJz6XP/{event.id}')
-        embed.add_field(name='Date', value=f'<t:{int(event.start_time.timestamp())}:R> - <t:{int(event.end_time.timestamp())}:R>')
+        embed.add_field(name='Date', value=f'<t:{int(event.start_time.timestamp())}:F> - <t:{int(event.end_time.timestamp())}:R>')
         embed.add_field(name='Event Members', value=f'Creator: {creator.mention}')
 
         thread = await channel.create_thread(
@@ -47,7 +75,7 @@ class events(commands.Cog):
         with open('data/events.json', 'w') as f:
             json.dump(data, f)
         return thread
-       
+
     @commands.Cog.listener()
     async def on_scheduled_event_create(self, event):
         await self.create_thread(event)
